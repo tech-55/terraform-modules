@@ -15,3 +15,7 @@ variable "argocd_source" {
   description = "Flexible Argo CD source definition"
   type        = map(any)
 }
+
+variable "argocd_syncPolicy" {
+   type        = map(any)
+}

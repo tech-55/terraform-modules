@@ -77,12 +77,7 @@ resource "kubernetes_manifest" "app" {
         namespace = var.namespace
       }
 
-      syncPolicy = {
-        automated = {
-          prune    = true
-          selfHeal = true
-        }
-      }
+      syncPolicy = var.argocd_syncPolicy
     }
   }
 }
