@@ -1,7 +1,7 @@
-output "aws_iam_role_service_account_arn" {
+output "service_account_aws_iam_role_arn" {
   value = aws_iam_role.service_account_role.arn
 }
-output "aws_iam_policy_service_account_arn" {
+output "service_account_aws_iam_policy_arn" {
     value = aws_iam_policy.service_account_policy.arn
 }
 

@@ -1,22 +1,6 @@
-
-terraform {
-  required_providers {
-    kubectl = { source = "gavinbunney/kubectl", version = "~> 1.14" }
-  }
-}
-
 provider "aws" {
   region = var.aws_region
 }
-
-provider "kubectl" {
-  host                   = var.eks_cluster_endpoint
-  cluster_ca_certificate = base64decode(var.eks_cluster_certificate_authority_data)
-  token                  = data.aws_eks_cluster_auth.this.token
-  load_config_file       = false
-}
-
-data "aws_eks_cluster_auth" "this" { name = var.eks_cluster_name }
 
 data "aws_iam_policy_document" "sa_policy_doc" {
   statement {
@@ -63,19 +47,4 @@ resource "aws_iam_role" "service_account_role" {
 resource "aws_iam_role_policy_attachment" "attach" {
   role       = aws_iam_role.service_account_role.name
   policy_arn = aws_iam_policy.service_account_policy.arn
-}
-
-
-resource "kubectl_manifest" "service_account" {
-  yaml_body = <<YAML
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: ${var.service_account_name}
-  namespace: ${var.namespace}
-  annotations:
-    eks.amazonaws.com/role-arn: ${aws_iam_role.service_account_role.arn}
-YAML
-
-depends_on = [aws_iam_role.service_account_role]
 }

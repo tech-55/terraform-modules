@@ -23,21 +23,6 @@ variable "allow_resources" {
     description = "List of allowed resources for the IAM policy"
 }
 
-variable "eks_cluster_name" {
-    description = "The name of the EKS cluster"
-    type        = string
-}
-
-variable "eks_cluster_endpoint" {
-    type = string
-    description = "The endpoint of the EKS cluster"
-}
-
-variable "eks_cluster_certificate_authority_data" {
-    type        = string
-    description = "The base64 encoded certificate authority data for the EKS cluster"
-    sensitive = true
-}
 
 variable "eks_oidc_provider_arn" {
     type = string
