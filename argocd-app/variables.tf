@@ -9,9 +9,9 @@ variable "argocd_key" {}
 variable "eks_key" {}
 
 variable "app_name" {}
-variable "github_repo_url" {}
 variable "namespace" {}
-variable "source" {
+variable "github_repo_url" {}
+variable "argocd_source" {
   description = "Flexible Argo CD source definition"
   type        = map(any)
 }
