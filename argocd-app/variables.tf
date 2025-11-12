@@ -11,11 +11,29 @@ variable "eks_key" {}
 variable "app_name" {}
 variable "namespace" {}
 variable "github_repo_url" {}
-variable "argocd_source" {
-  description = "Flexible Argo CD source definition"
-  type        = map(any)
-}
 
+
+variable "argocd_source" {
+  type = object({
+    repoURL        = string
+    targetRevision = optional(string)
+    path           = optional(string)
+    helm = optional(object({
+      valueFiles  = optional(list(string))
+      values      = optional(string)
+      parameters  = optional(list(object({
+        name        = string
+        value       = string
+        forceString = optional(bool)
+      })))
+    }))
+  })
+}
 variable "argocd_syncPolicy" {
-   type        = map(any)
+  type = object({
+    automated = optional(object({
+      prune    = optional(bool)
+      selfHeal = optional(bool)
+    }))
+  })
 }
