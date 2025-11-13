@@ -12,9 +12,8 @@ variable "app_name" {}
 variable "namespace" {}
 variable "github_repo_url" {}
 
-
-variable "argocd_source" {
-  type = object({
+variable "argocd_sources" {
+  type = list(object({
     repoURL        = string
     targetRevision = optional(string)
     chart          = optional(string)
@@ -27,7 +26,7 @@ variable "argocd_source" {
         forceString = optional(bool)
       })))
     }))
-  })
+  }))
 }
 
 variable "argocd_syncPolicy" {
