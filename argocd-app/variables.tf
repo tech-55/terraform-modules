@@ -17,7 +17,7 @@ variable "argocd_source" {
   type = object({
     repoURL        = string
     targetRevision = optional(string)
-    path           = optional(string)
+    chart          = optional(string)
     helm = optional(object({
       valueFiles  = optional(list(string))
       values      = optional(string)
