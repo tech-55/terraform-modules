@@ -70,8 +70,7 @@ resource "kubernetes_manifest" "app" {
     }
     spec = {
       project = "default"
-      # source = var.argocd_source
-      sources = var.argocd_sources
+      source = var.argocd_source
 
       destination = {
         server    = "https://kubernetes.default.svc"
