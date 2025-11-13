@@ -29,6 +29,23 @@ variable "argocd_source" {
     }))
   })
 }
+
+variable "argocd_sources" {
+  type = list(object({
+    repoURL        = string
+    targetRevision = optional(string)
+    chart          = optional(string)
+    helm = optional(object({
+      valueFiles  = optional(list(string))
+      values      = optional(string)
+      parameters  = optional(list(object({
+        name        = string
+        value       = string
+        forceString = optional(bool)
+      })))
+    }))
+  }))
+}
 variable "argocd_syncPolicy" {
   type = object({
     automated = optional(object({
