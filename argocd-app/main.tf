@@ -89,6 +89,9 @@ resource "kubernetes_manifest" "argocd_app" {
           helm = {
             valueFiles = [
               "$values${var.argocd_sources.helmValues}"
+            ],
+            parameters =  [
+              { name = "image.repository", value = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}" },
             ]
           }
         },
