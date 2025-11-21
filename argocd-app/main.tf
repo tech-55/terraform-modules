@@ -80,7 +80,7 @@ resource "kubernetes_manifest" "argocd_app" {
     }
     spec = {
       project = local.argocd_app_name
-      ources = [
+      sources = [
         {
           repoURL        = local.helm_chart_url
           targetRevision = var.argocd_sources.helmTargetRevision,
