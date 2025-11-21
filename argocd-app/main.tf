@@ -122,12 +122,10 @@ resource "kubernetes_manifest" "argocd_image_updater" {
 
       writeBackConfig = {
         method = "git"
-        commitMessage = "chore: update image tags for ${ var.app_name } in file ${each.value.helmValues} in ${ each.value.branch } branch"
-        authorName = "argocd-image-updater"
         gitConfig = {
           repository = var.github_repo_url
           branch = each.value.branch
-          writeBackTarget = each.value.helmValues
+          writeBackTarget = "helmvalues:${each.value.helmValues}"
         }
       }
       
@@ -137,9 +135,9 @@ resource "kubernetes_manifest" "argocd_image_updater" {
       }
       
       applicationRefs = [{
-          name =  local.argocd_app_name                # This matches metadata.name of the Argo CD Application
+          namePattern  =  local.argocd_app_name                # This matches metadata.name of the Argo CD Application
           images = [{
-            alias = "myapp"
+            alias =  local.argocd_app_name + "-" + each.value.branch   # An alias to identify this image within the application
             imageName = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}"  # ECR image name
               # How to map this image into your Helm values
               manifestTargets = {
