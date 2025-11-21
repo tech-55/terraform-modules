@@ -9,7 +9,7 @@ terraform {
 
 locals {
   aws_sandbox_account_id = "864899843511"  //sandbox account id
-  automate_sync = var.aws_account == aws_sandbox_account_id ? true : false
+  automate_sync = var.aws_account == local.aws_sandbox_account_id ? true : false
   helm_chart_url = "https://tech-55.github.io/tech55-infra-apps-helm-charts"
   helm_chart_version = "0.1.8"
   helm_chart_name = "app"
