@@ -87,7 +87,7 @@ resource "kubernetes_manifest" "argocd_app" {
           chart          = local.helm_chart_name
           helm = {
             valueFiles = [
-              "$values/${var.argocd_sources.helmValues}"
+              "$values${var.argocd_sources.helmValues}"
             ]
           }
         },
