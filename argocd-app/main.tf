@@ -67,7 +67,7 @@ resource "kubernetes_secret_v1" "argocd_github_repo" {
     url                  = var.github_repo_url
     githubAppID          = data.terraform_remote_state.argocd.outputs.argocd_github_app_id
     githubAppInstallationID = data.terraform_remote_state.argocd.outputs.argocd_github_app_installation_id
-    githubAppPrivateKey  = data.terraform_remote_state.argocd.outputs.argocd_github_app_rsa_private_key
+    githubAppPrivateKey  = base64decode(data.terraform_remote_state.argocd.outputs.github_rsa_private_key_base64)
   }
 }
 
