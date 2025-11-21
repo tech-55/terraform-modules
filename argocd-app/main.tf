@@ -7,6 +7,17 @@ terraform {
   }
 }
 
+locals {
+  aws_sandbox_account_id = "864899843511"  //sandbox account id
+  automate_sync = var.aws_account == aws_sandbox_account_id ? true : false
+  helm_chart_url = "https://tech-55.github.io/tech55-infra-apps-helm-charts"
+  helm_chart_version = "0.1.8"
+  helm_chart_name = "app"
+  argocd_sources_map = { for source in var.argocd_sources : source.branch => source }
+  argocd_app_name = "${var.namespace}-${ var.app_name }-app"
+  argocd_nasmespace = "argocd"
+}
+
 provider "aws" {
   region = var.aws_region
 }
@@ -42,8 +53,8 @@ provider "kubernetes" {
 
 resource "kubernetes_secret_v1" "argocd_github_repo" {
   metadata {
-    name      = "repo-github-${ var.app_name }"
-    namespace = "argocd"
+    name      = "repo-github-${ var.app_name }-secret"
+    namespace = local.argocd_nasmespace
     labels = {
       "argocd.argoproj.io/secret-type" = "repository"
     }
@@ -60,24 +71,87 @@ resource "kubernetes_secret_v1" "argocd_github_repo" {
   }
 }
 
-resource "kubernetes_manifest" "app" {
+resource "kubernetes_manifest" "argocd_app" {
+
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
     metadata = {
-      name      = "${var.namespace}-${ var.app_name }"
-      namespace = "argocd"
+      name      = local.argocd_app_name
+      namespace = local.argocd_nasmespace
     }
     spec = {
       project = "default"
-      sources = var.argocd_sources
+      sources = [for source in var.argocd_sources : {
+        repoURL        = local.helm_chart_url
+        targetRevision = lookup(source, "targetRevision", local.helm_chart_version)
+        chart          = local.helm_chart_name
+        helm = contains(keys(source), "helmValues") ? {
+          values = lookup(source, "helmValues", null)
+        } : null
+      }]
 
       destination = {
         server    = "https://kubernetes.default.svc"
         namespace = var.namespace
       }
 
-      syncPolicy = var.argocd_syncPolicy
+      syncPolicy = {
+        automated = {
+          prune = local.automate_sync
+          selfHeal = local.automate_sync
+        }
+      }
+    }
+  }
+}
+
+
+resource "kubernetes_manifest" "argocd_image_updater" {
+  for_each = local.argocd_sources_map
+
+  manifest = {
+    apiVersion = "argocd-image-updater.argoproj.io/v1alpha1"
+    kind       = "ImageUpdater"
+    metadata = {
+      name      = "${var.namespace}-${ var.app_name }-${ each.value.branch }-image-updater"
+      namespace = local.argocd_nasmespace
+    }
+    spec = {
+      namespace = local.argocd_nasmespace
+
+      writeBackConfig = {
+        method = "git"
+        repo = var.github_repo_url
+        commitMessage = "chore: update image tags for ${ var.app_name } in file ${each.value.helmValues} in ${ each.value.branch } branch"
+        authorName = "argocd-image-updater"
+        gitConfig = {
+          repository = var.github_repo_url
+          branch = each.value.branch
+          writeBackTarget = each.value.helmValues
+        }
+      }
+      
+      commonUpdateSettings = {
+        updateStrategy = "semver"       # or "latest" / "digest" etc. 
+        forceUpdate =  true
+      }
+      
+      applicationRefs = [{
+          name =  local.argocd_app_name                # This matches metadata.name of the Argo CD Application
+          images = [{
+            alias = "myapp"
+            imageName = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}"  # ECR image name
+              # How to map this image into your Helm values
+              manifestTargets = {
+                helm = {
+                  name = "image.repository"   # .Values.image.repository
+                  tag = "image.tag"           # .Values.image.tag
+                }
+              }
+
+        }]
+      }]
     }
   }
 }
