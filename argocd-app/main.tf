@@ -122,7 +122,6 @@ resource "kubernetes_manifest" "argocd_image_updater" {
 
       writeBackConfig = {
         method = "git"
-        repo = var.github_repo_url
         commitMessage = "chore: update image tags for ${ var.app_name } in file ${each.value.helmValues} in ${ each.value.branch } branch"
         authorName = "argocd-image-updater"
         gitConfig = {
