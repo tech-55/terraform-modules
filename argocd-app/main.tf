@@ -81,7 +81,7 @@ resource "kubernetes_manifest" "argocd_app" {
       namespace = local.argocd_nasmespace
     }
     spec = {
-      project = "default"
+      project = local.argocd_app_name
       sources = [for source in var.argocd_sources : {
         repoURL        = local.helm_chart_url
         targetRevision = lookup(source, "targetRevision", local.helm_chart_version)

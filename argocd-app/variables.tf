@@ -12,7 +12,7 @@ variable "github_repo_url" {}
 variable "argocd_sources" {
   type = list(object({
     targetRevision = optional(string)
-    helmValues     = string
+    helmValues     = optional(string)
     branch         = string
   }))
 }
