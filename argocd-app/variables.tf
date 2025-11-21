@@ -11,11 +11,8 @@ variable "github_repo_url" {}
 
 variable "argocd_sources" {
   type = object({
-    helmTargetRevision = string
+    helmTargetRevision = optional(string, "0.1.8")
     helmValues     = string
     branch         = string
   })
-  default = {
-    helmTargetRevision = "0.1.8"
-  }
 }
