@@ -11,7 +11,6 @@ locals {
   aws_sandbox_account_id = "864899843511"  //sandbox account id
   automate_sync = var.aws_account == local.aws_sandbox_account_id ? true : false
   helm_chart_url = "https://tech-55.github.io/tech55-infra-apps-helm-charts"
-  helm_chart_version = "0.1.8"
   helm_chart_name = "app"
   argocd_sources_map = { for source in var.argocd_sources : source.branch => source }
   argocd_app_name = "${var.namespace}-${ var.app_name }-app"
@@ -82,14 +81,23 @@ resource "kubernetes_manifest" "argocd_app" {
     }
     spec = {
       project = local.argocd_app_name
-      sources = [for source in var.argocd_sources : {
-        repoURL        = local.helm_chart_url
-        targetRevision = lookup(source, "targetRevision", local.helm_chart_version)
-        chart          = local.helm_chart_name
-        helm = contains(keys(source), "helmValues") ? {
-          values = lookup(source, "helmValues", null)
-        } : null
-      }]
+      ources = [
+        {
+          repoURL        = local.helm_chart_url
+          targetRevision = var.argocd_sources.helmTargetRevision,
+          chart          = local.helm_chart_name
+          helm = {
+            valueFiles = [
+              "$values/${var.argocd_sources.helmValues}"
+            ]
+          }
+        },
+        {
+          repoURL        = var.github_repo_url
+          targetRevision = var.argocd_sources.branch,
+          ref = "values"
+        }
+      ]
 
       destination = {
         server    = "https://kubernetes.default.svc"
@@ -125,7 +133,7 @@ resource "kubernetes_manifest" "argocd_image_updater" {
         gitConfig = {
           repository = var.github_repo_url
           branch = each.value.branch
-          writeBackTarget = "helmvalues:${each.value.helmValues}"
+          writeBackTarget = "helmvalues:.${each.value.helmValues}"
         }
       }
       
