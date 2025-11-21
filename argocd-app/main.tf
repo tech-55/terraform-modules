@@ -12,7 +12,6 @@ locals {
   automate_sync = var.aws_account == local.aws_sandbox_account_id ? true : false
   helm_chart_url = "https://tech-55.github.io/tech55-infra-apps-helm-charts"
   helm_chart_name = "app"
-  argocd_sources_map = { for source in var.argocd_sources : source.branch => source }
   argocd_app_name = "${var.namespace}-${ var.app_name }-app"
   argocd_nasmespace = "argocd"
 }
@@ -116,13 +115,12 @@ resource "kubernetes_manifest" "argocd_app" {
 
 
 resource "kubernetes_manifest" "argocd_image_updater" {
-  for_each = local.argocd_sources_map
 
   manifest = {
     apiVersion = "argocd-image-updater.argoproj.io/v1alpha1"
     kind       = "ImageUpdater"
     metadata = {
-      name      = "${var.namespace}-${ var.app_name }-${ each.value.branch }-image-updater"
+      name      = "${var.namespace}-${ var.app_name }-${ var.argocd_sources.branch }-image-updater"
       namespace = local.argocd_nasmespace
     }
     spec = {
@@ -132,8 +130,8 @@ resource "kubernetes_manifest" "argocd_image_updater" {
         method = "git"
         gitConfig = {
           repository = var.github_repo_url
-          branch = each.value.branch
-          writeBackTarget = "helmvalues:.${each.value.helmValues}"
+          branch = var.argocd_sources.branch
+          writeBackTarget = "helmvalues:.${var.argocd_sources.helmValues}"
         }
       }
       
@@ -145,7 +143,7 @@ resource "kubernetes_manifest" "argocd_image_updater" {
       applicationRefs = [{
           namePattern  =  local.argocd_app_name                # This matches metadata.name of the Argo CD Application
           images = [{
-            alias =  "${lower(local.argocd_app_name)}-${lower(each.value.branch)}"   # An alias to identify this image within the application
+            alias =  "${lower(local.argocd_app_name)}-${lower(var.argocd_sources.branch)}"   # An alias to identify this image within the application
             imageName = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}"  # ECR image name
               # How to map this image into your Helm values
               manifestTargets = {
@@ -154,7 +152,6 @@ resource "kubernetes_manifest" "argocd_image_updater" {
                   tag = "image.tag"           # .Values.image.tag
                 }
               }
-
         }]
       }]
     }
