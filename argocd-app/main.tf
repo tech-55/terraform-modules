@@ -14,6 +14,7 @@ locals {
   helm_chart_name = "app"
   argocd_app_name = "${var.namespace}-${ var.app_name }-app"
   argocd_nasmespace = "argocd"
+  project = "default"
 }
 
 provider "aws" {
@@ -61,7 +62,7 @@ resource "kubernetes_secret_v1" "argocd_github_repo" {
   type = "Opaque"
   data = {
     type                 = "git"
-    project              = "default"
+    project              = local.project
     url                  = var.github_repo_url
     githubAppID          = data.terraform_remote_state.argocd.outputs.argocd_github_app_id
     githubAppInstallationID = data.terraform_remote_state.argocd.outputs.argocd_github_app_installation_id
@@ -79,7 +80,7 @@ resource "kubernetes_manifest" "argocd_app" {
       namespace = local.argocd_nasmespace
     }
     spec = {
-      project = local.argocd_app_name
+      project = local.project
       sources = [
         {
           repoURL        = local.helm_chart_url
