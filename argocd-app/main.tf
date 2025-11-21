@@ -137,7 +137,7 @@ resource "kubernetes_manifest" "argocd_image_updater" {
       applicationRefs = [{
           namePattern  =  local.argocd_app_name                # This matches metadata.name of the Argo CD Application
           images = [{
-            alias =  local.argocd_app_name + "-" + each.value.branch   # An alias to identify this image within the application
+            alias =  "${lower(local.argocd_app_name)}-${lower(each.value.branch)}"   # An alias to identify this image within the application
             imageName = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}"  # ECR image name
               # How to map this image into your Helm values
               manifestTargets = {
