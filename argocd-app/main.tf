@@ -15,7 +15,7 @@ locals {
   argocd_app_name = "${var.namespace}-${ var.app_name }-app"
   argocd_nasmespace = "argocd"
   project = "default"
-  update_strategy = "latest" # or "semver" / "latest" / "digest" etc. 
+  update_strategy = "newest-build" # or "semver" / "latest" / "digest" / newest-build 
 }
 
 provider "aws" {
