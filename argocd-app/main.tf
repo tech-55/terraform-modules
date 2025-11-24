@@ -15,6 +15,7 @@ locals {
   argocd_app_name = "${var.namespace}-${ var.app_name }-app"
   argocd_nasmespace = "argocd"
   project = "default"
+  update_strategy = "semver" # or "semver" / "latest" / "digest" etc. 
 }
 
 provider "aws" {
@@ -140,7 +141,7 @@ resource "kubernetes_manifest" "argocd_image_updater" {
       }
       
       commonUpdateSettings = {
-        updateStrategy = "semver"       # or "semver" / "latest" / "digest" etc. 
+        updateStrategy = local.update_strategy       # or "semver" / "latest" / "digest" etc. 
         forceUpdate =  true
       }
       
@@ -148,14 +149,16 @@ resource "kubernetes_manifest" "argocd_image_updater" {
           namePattern  =  local.argocd_app_name                # This matches metadata.name of the Argo CD Application
           images = [{
             alias =  "${lower(local.argocd_app_name)}-${lower(var.argocd_sources.branch)}"   # An alias to identify this image within the application
+            updateStrategy= local.update_strategy
+            allowTags = "regexp:^\\d+\\.\\d+\\.\\d+$"
             imageName = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}"  # ECR image name
               # How to map this image into your Helm values
-              manifestTargets = {
-                helm = {
-                  name = "image.repository"   # .Values.image.repository
-                  tag = "image.tag"           # .Values.image.tag
-                }
+            manifestTargets = {
+              helm = {
+                name = "image.repository"   # .Values.image.repository
+                tag = "image.tag"           # .Values.image.tag
               }
+            }
         }]
       }]
     }
