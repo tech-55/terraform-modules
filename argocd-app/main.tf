@@ -140,7 +140,7 @@ resource "kubernetes_manifest" "argocd_image_updater" {
       }
       
       commonUpdateSettings = {
-        updateStrategy = "semver"       # or "latest" / "digest" etc. 
+        updateStrategy = "latest"       # or "latest" / "digest" etc. 
         forceUpdate =  true
       }
       
