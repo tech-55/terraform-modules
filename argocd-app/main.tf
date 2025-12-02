@@ -15,7 +15,8 @@ locals {
   argocd_app_name = "${var.namespace}-${ var.app_name }-app"
   argocd_nasmespace = "argocd"
   project = "default"
-  update_strategy = "newest-build" # or "semver" / "latest" / "digest" / newest-build 
+  update_strategy = "newest-build" # or "semver" / "latest" / "digest" / newest-build
+  environment_name =  var.aws_account == local.aws_sandbox_account_id ? "Sandbox" : "Production"
 }
 
 provider "aws" {
@@ -93,6 +94,7 @@ resource "kubernetes_manifest" "argocd_app" {
             ],
             parameters =  [
               { name = "image.repository", value = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}" },
+              { name = "environmentName", value = local.environment_name },
             ]
           }
         },
