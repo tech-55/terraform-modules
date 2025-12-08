@@ -9,6 +9,7 @@ terraform {
 
 locals {
   aws_sandbox_account_id = "864899843511"  //sandbox account id
+  aws_pci_account_id = "535424203419"  //pci account id
   automate_sync = var.aws_account == local.aws_sandbox_account_id ? true : false
   helm_chart_url = "https://tech-55.github.io/tech55-infra-apps-helm-charts"
   helm_chart_name = "app"
@@ -17,6 +18,7 @@ locals {
   project = "default"
   update_strategy = "newest-build" # or "semver" / "latest" / "digest" / newest-build
   environment_name =  var.aws_account == local.aws_sandbox_account_id ? "Sandbox" : "Production"
+  prefix_env = var.aws_account == local.aws_pci_account_id ? "Pci" : ""
 }
 
 provider "aws" {
@@ -95,7 +97,7 @@ resource "kubernetes_manifest" "argocd_app" {
             parameters =  [
               { name = "image.repository", value = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}" },
               { name = "environmentName", value = "${local.environment_name}" },
-              { name = "awsAccountId", value = "${var.aws_account}" },
+              { name = "awsAccountAlias", value = "${local.prefix_env}${var.aws_account}" },
             ]
           }
         },
