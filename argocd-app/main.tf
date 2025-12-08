@@ -95,6 +95,7 @@ resource "kubernetes_manifest" "argocd_app" {
             parameters =  [
               { name = "image.repository", value = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}" },
               { name = "environmentName", value = "${local.environment_name}" },
+              { name = "awsAccountId", value = "${var.aws_account}" },
             ]
           }
         },
