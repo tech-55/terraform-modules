@@ -25,7 +25,7 @@ locals {
       prune = true
       selfHeal = true
     }
-  } : null
+  } : {}
 }
 
 provider "aws" {
