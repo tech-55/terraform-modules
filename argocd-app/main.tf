@@ -25,7 +25,13 @@ locals {
       prune = true
       selfHeal = true
     }
-  } : {}
+  } : {
+    automated = {
+      prune = false
+      selfHeal = false
+    }
+    syncOptions: []
+  }
 }
 
 provider "aws" {
