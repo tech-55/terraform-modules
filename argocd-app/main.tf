@@ -137,10 +137,7 @@ resource "kubernetes_manifest" "argocd_app" {
         namespace = var.namespace
       }
 
-      # 🔑 Manual sync (manual approval)
-      syncPolicy = {
-        syncOptions = []
-      }
+      syncPolicy = local.sync_policy
     }
   }
 }
