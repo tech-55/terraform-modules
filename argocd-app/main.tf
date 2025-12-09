@@ -26,13 +26,7 @@ locals {
       selfHeal = true
     }
   } : {
-    automated = {
-      prune = false
-      selfHeal = false
-    }
-    syncOptions = [
-      "Prune=confirm"
-    ]
+    syncOptions = []
   }
 }
 
