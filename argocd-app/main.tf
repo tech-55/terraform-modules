@@ -84,36 +84,49 @@ resource "kubernetes_secret_v1" "argocd_github_repo" {
 }
 
 resource "kubernetes_manifest" "argocd_app" {
-
   manifest = {
     apiVersion = "argoproj.io/v1alpha1"
     kind       = "Application"
+
     metadata = {
       name      = local.argocd_app_name
       namespace = local.argocd_nasmespace
     }
+
     spec = {
       project = local.project
+
       sources = [
         {
           repoURL        = local.helm_chart_url
-          targetRevision = var.argocd_sources.helmTargetRevision,
+          targetRevision = var.argocd_sources.helmTargetRevision
           chart          = local.helm_chart_name
+
           helm = {
             valueFiles = [
               "$values${var.argocd_sources.helmValues}"
-            ],
-            parameters =  [
-              { name = "image.repository", value = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}" },
-              { name = "environmentName", value = "${local.environment_name}" },
-              { name = "awsAccountAlias", value = "${local.prefix_env}${local.environment_name}" },
+            ]
+
+            parameters = [
+              {
+                name  = "image.repository"
+                value = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}"
+              },
+              {
+                name  = "environmentName"
+                value = local.environment_name
+              },
+              {
+                name  = "awsAccountAlias"
+                value = "${local.prefix_env}${local.environment_name}"
+              },
             ]
           }
         },
         {
           repoURL        = var.github_repo_url
-          targetRevision = var.argocd_sources.branch,
-          ref = "values"
+          targetRevision = var.argocd_sources.branch
+          ref            = "values"
         }
       ]
 
@@ -121,11 +134,15 @@ resource "kubernetes_manifest" "argocd_app" {
         server    = "https://kubernetes.default.svc"
         namespace = var.namespace
       }
-    }
 
-    syncPolicy = local.sync_policy
+      # 🔑 Manual sync (manual approval)
+      syncPolicy = {
+        syncOptions = []
+      }
+    }
   }
 }
+
 
 
 resource "kubernetes_manifest" "argocd_image_updater" {
