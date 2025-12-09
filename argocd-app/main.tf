@@ -30,7 +30,9 @@ locals {
       prune = false
       selfHeal = false
     }
-    syncOptions: []
+    syncOptions: [
+      "Prune=confirm"
+    ]
   }
 }
 
