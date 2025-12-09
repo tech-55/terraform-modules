@@ -24,8 +24,10 @@ locals {
     automated = {
       prune = true
       selfHeal = true
-    }
+    },
+    syncOptions = null
   } : {
+    automated = null,
     syncOptions = []
   }
 }
