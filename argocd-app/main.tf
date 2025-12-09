@@ -26,7 +26,7 @@ locals {
       selfHeal = true
     }
   } : {
-    syncOptions: [
+    syncOptions = [
       "Prune=confirm"
     ]
   }
