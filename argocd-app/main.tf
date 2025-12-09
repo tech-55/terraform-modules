@@ -121,11 +121,9 @@ resource "kubernetes_manifest" "argocd_app" {
         server    = "https://kubernetes.default.svc"
         namespace = var.namespace
       }
-
-      syncPolicy = {
-        syncOptions = []
-      }
     }
+
+    syncPolicy = local.sync_policy
   }
 }
 
