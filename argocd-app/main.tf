@@ -27,7 +27,10 @@ locals {
     },
     syncOptions = null
   } : {
-    automated = null,
+    automated = {
+      prune = false
+      selfHeal = false
+    },
     syncOptions = []
   }
 }
