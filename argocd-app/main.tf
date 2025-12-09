@@ -19,6 +19,13 @@ locals {
   update_strategy = "newest-build" # or "semver" / "latest" / "digest" / newest-build
   environment_name =  var.aws_account == local.aws_sandbox_account_id ? "Sandbox" : "Production"
   prefix_env = var.aws_account == local.aws_pci_account_id ? "Pci" : ""
+
+  sync_policy = var.aws_account == local.aws_sandbox_account_id ? {
+    automated = {
+      prune = true
+      selfHeal = true
+    }
+  } : null
 }
 
 provider "aws" {
@@ -113,12 +120,7 @@ resource "kubernetes_manifest" "argocd_app" {
         namespace = var.namespace
       }
 
-      syncPolicy = {
-        automated = {
-          prune = local.automate_sync
-          selfHeal = local.automate_sync
-        }
-      }
+      syncPolicy = local.sync_policy
     }
   }
 }
