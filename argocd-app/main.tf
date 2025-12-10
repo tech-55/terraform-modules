@@ -125,6 +125,10 @@ resource "kubernetes_manifest" "argocd_app" {
                 name  = "awsAccountAlias"
                 value = "${local.prefix_env}${local.environment_name}"
               },
+              {
+                name  = "appName"
+                value = "${var.app_name}"
+              },
             ]
           }
         },
