@@ -129,6 +129,10 @@ resource "kubernetes_manifest" "argocd_app" {
                 name  = "appName"
                 value = "${var.app_name}"
               },
+              {
+                name  = "namespace"
+                value = "${var.namespace}"
+              },
             ]
           }
         },
