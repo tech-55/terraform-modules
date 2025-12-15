@@ -10,10 +10,14 @@ terraform {
 locals {
   aws_sandbox_account_id = "864899843511"  //sandbox account id
   aws_pci_account_id = "535424203419"  //pci account id
+  aws_production_account_id = "112233445566"  //production account id
+
+  app_name = var.aws_account == local.aws_sandbox_account_id ? "-snb" : var.aws_account == local.aws_pci_account_id ? "-prd" : var.aws_account == local.aws_production_account_id ? "-pci-prd" : "unknown"
+
   automate_sync = var.aws_account == local.aws_sandbox_account_id ? true : false
   helm_chart_url = "https://tech-55.github.io/tech55-infra-apps-helm-charts"
   helm_chart_name = "app"
-  argocd_app_name = "${var.namespace}-${ var.app_name }-app"
+  argocd_app_name = "${var.namespace}-${ local.app_name }-app"
   argocd_nasmespace = "argocd"
   project = "default"
   update_strategy = "newest-build" # or "semver" / "latest" / "digest" / newest-build
@@ -70,7 +74,7 @@ provider "kubernetes" {
 
 resource "kubernetes_secret_v1" "argocd_github_repo" {
   metadata {
-    name      = "repo-github-${ var.app_name }-secret"
+    name      = "repo-github-${ local.app_name }-secret"
     namespace = local.argocd_nasmespace
     labels = {
       "argocd.argoproj.io/secret-type" = "repository"
@@ -87,6 +91,9 @@ resource "kubernetes_secret_v1" "argocd_github_repo" {
     githubAppPrivateKey  = base64decode(data.terraform_remote_state.argocd.outputs.argocd_github_app_rsa_private_key_base64)
   }
 }
+
+
+
 
 resource "kubernetes_manifest" "argocd_app" {
   manifest = {
@@ -119,7 +126,7 @@ resource "kubernetes_manifest" "argocd_app" {
               },
               {
                 name  = "environmentName"
-                value = local.environment_name
+                value = "${local.environment_name}"
               },
               {
                 name  = "awsAccountAlias"
@@ -127,7 +134,7 @@ resource "kubernetes_manifest" "argocd_app" {
               },
               {
                 name  = "appName"
-                value = "${var.app_name}"
+                value = "${local.app_name}"
               },
               {
                 name  = "namespace"
@@ -161,7 +168,7 @@ resource "kubernetes_manifest" "argocd_image_updater" {
     apiVersion = "argocd-image-updater.argoproj.io/v1alpha1"
     kind       = "ImageUpdater"
     metadata = {
-      name      = "${var.namespace}-${ var.app_name }-${ var.argocd_sources.branch }-image-updater"
+      name      = "${var.namespace}-${ local.app_name }-${ var.argocd_sources.branch }-image-updater"
       namespace = local.argocd_nasmespace
     }
     spec = {
@@ -186,7 +193,6 @@ resource "kubernetes_manifest" "argocd_image_updater" {
           images = [{
             alias =  "${lower(local.argocd_app_name)}-${lower(var.argocd_sources.branch)}"   # An alias to identify this image within the application
             updateStrategy= local.update_strategy
-            //allowTags = "regexp:^\\d+\\.\\d+\\.\\d+$"
             imageName = "${var.aws_account}.dkr.ecr.${var.aws_region}.amazonaws.com/${var.app_name}"  # ECR image name
               # How to map this image into your Helm values
             manifestTargets = {
