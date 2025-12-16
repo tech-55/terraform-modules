@@ -2,13 +2,14 @@ variable "aws_region" {
     description = "The AWS region to deploy resources in"
     type        = string
 }
+variable "aws_account" {}
 
 variable "namespace" {
     description = "The Kubernetes namespace where the service account is located"
     type        = string
 }
 
-variable "service_account_name" {
+variable "app_name" {
     description = "The name of the Kubernetes service account"
     type        = string
 }
