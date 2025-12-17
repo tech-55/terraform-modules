@@ -17,7 +17,6 @@ locals {
 
   suffix_app_name = var.aws_account == local.aws_sandbox_account_id ? "-snb" : var.aws_account == local.aws_pci_account_id ? "-prd" : var.aws_account == local.aws_production_account_id ? "-pci-prd" : "unknown"
   app_name = "${var.app_name}${local.suffix_app_name}"
-
 }
 
 resource "aws_iam_policy" "service_account_policy" {
@@ -43,7 +42,7 @@ data "aws_iam_policy_document" "trust" {
     condition {
       test     = "StringEquals"
       variable = "${var.eks_oidc_issuer_host}:sub"
-      values   = ["system:serviceaccount:${var.namespace}:${local.app_name}"]
+      values   = ["system:serviceaccount:${var.namespace}:${local.app_name}-sa"]
     }
   }
 }
