@@ -2,14 +2,6 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "aws_iam_policy_document" "sa_policy_doc" {
-  statement {
-    effect  = "Allow"
-    actions = var.allow_actions
-    resources = var.allow_resources
-  }
-}
-
 locals {
   aws_sandbox_account_id = "864899843511"  //sandbox account id
   aws_pci_account_id = "535424203419"  //pci account id
@@ -19,9 +11,20 @@ locals {
   app_name = "${var.app_name}${local.suffix_app_name}"
 }
 
+data "aws_iam_policy_document" "sa_policy_doc" {
+  dynamic "statement" {
+    for_each = var.policies
+
+    content {
+      effect    = "Allow"
+      actions   = statement.value.allow_actions
+      resources = statement.value.allow_resources
+    }
+  }
+}
+
 resource "aws_iam_policy" "service_account_policy" {
   name        = "${var.namespace}-${local.app_name}-policy"
-  description = "Scoped DynamoDB access for accountService via IRSA"
   policy      = data.aws_iam_policy_document.sa_policy_doc.json
 }
 

@@ -17,17 +17,6 @@ variable "app_name" {
     type        = string
 }
 
-variable "allow_actions" {
-    description = "List of allowed actions for the IAM policy"
-    type        = list(string)
-}
-
-variable "allow_resources" {
-    type       = list(string)
-    description = "List of allowed resources for the IAM policy"
-}
-
-
 variable "eks_oidc_provider_arn" {
     type = string
     description = "The ARN of the EKS OIDC provider"
@@ -35,4 +24,11 @@ variable "eks_oidc_provider_arn" {
 
 variable "eks_oidc_issuer_host" {
     type = string
+}
+
+variable "policies" {
+  type = list(object({
+    allow_actions = list(string)
+    allow_resources = list(string)
+  }))
 }
