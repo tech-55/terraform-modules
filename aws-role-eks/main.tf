@@ -5,7 +5,7 @@ provider "aws" {
 locals {
   aws_sandbox_account_id = "864899843511"  //sandbox account id
   aws_pci_account_id = "535424203419"  //pci account id
-  aws_production_account_id = "112233445566"  //production account id
+  aws_production_account_id = "025066240173"  //production account id
 
   suffix_app_name = var.aws_account == local.aws_sandbox_account_id ? "-snb" : var.aws_account == local.aws_pci_account_id ? "-prd" : var.aws_account == local.aws_production_account_id ? "-pci-prd" : "unknown"
   app_name = "${var.app_name}${local.suffix_app_name}"
