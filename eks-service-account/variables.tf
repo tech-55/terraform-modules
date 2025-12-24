@@ -8,20 +8,21 @@ variable "namespace" {
     type        = string
 }
 
-variable "service_account_name" {
+variable "app_name" {
     description = "The name of the Kubernetes service account"
     type        = string
 }
 
-variable "allow_actions" {
-    description = "List of allowed actions for the IAM policy"
-    type        = list(string)
-}
-
-variable "allow_resources" {
-    type       = list(string)
-    description = "List of allowed resources for the IAM policy"
+variable "policies" {
+  type = list(object({
+    allow_actions = list(string)
+    allow_resources = list(string)
+  }))
 }
 
 variable "bucket" {}
 variable "eks_key" {}
+
+variable "aws_account" {
+  
+}

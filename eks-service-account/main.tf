@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.32"
+    }
+    kubectl = { source = "gavinbunney/kubectl", version = "~> 1.14" }
+  }
+}
 
 
 provider "aws" {
@@ -41,12 +50,12 @@ module "create_aws_role_eks" {
   source = "../aws-role-eks"
     
   aws_region               = var.aws_region
+  aws_account              = var.aws_account
   eks_oidc_provider_arn    = data.terraform_remote_state.eks.outputs.eks_oidc_provider_arn
   eks_oidc_issuer_host     = data.terraform_remote_state.eks.outputs.eks_oidc_issuer_host
   namespace                = var.namespace
-  service_account_name     = var.service_account_name
-  allow_actions            = var.allow_actions
-  allow_resources          = var.allow_resources
+  app_name                 = var.app_name
+  policies                  = var.policies
 }
 
 
