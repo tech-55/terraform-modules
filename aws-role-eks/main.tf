@@ -9,6 +9,8 @@ locals {
 
   suffix_app_name = var.aws_account == local.aws_sandbox_account_id ? "-snb" : var.aws_account == local.aws_pci_account_id ? "-prd" : var.aws_account == local.aws_production_account_id ? "-pci-prd" : "unknown"
   app_name = "${var.app_name}${local.suffix_app_name}"
+
+  is_trust = var.eks_oidc_issuer_host != "" && var.eks_oidc_provider_arn != ""
 }
 
 data "aws_iam_policy_document" "sa_policy_doc" {
@@ -50,9 +52,23 @@ data "aws_iam_policy_document" "trust" {
   }
 }
 
+
+data "aws_iam_policy_document" "without_trust" {
+  statement {
+    sid     = "OIDCTrust"
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [var.eks_oidc_provider_arn]
+    }
+  }
+}
+
 resource "aws_iam_role" "service_account_role" {
   name               = "${var.namespace}-${local.app_name}-role"
-  assume_role_policy = data.aws_iam_policy_document.trust.json
+  assume_role_policy = is_trust ? data.aws_iam_policy_document.trust.json : data.aws_iam_policy_document.witout_trust
   description        = "IRSA role for accountService pods to access DynamoDB"
 }
 
