@@ -15,6 +15,11 @@ variable "namespace" {
 variable "app_name" {
     description = "The name of the Kubernetes service account"
     type        = string
+    default = ""
+}
+
+variable "service_account_name" {
+  default = ""
 }
 
 variable "eks_oidc_provider_arn" {
