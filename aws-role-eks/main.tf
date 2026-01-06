@@ -48,6 +48,19 @@ data "aws_iam_policy_document" "trust" {
       values   = ["system:serviceaccount:${var.namespace}:${local.app_name}"]
     }
   }
+
+  dynamic "statement" {
+    for_each = length(var.trusted_role_arns) > 0 ? [1] : []
+    content {
+      sid     = "RoleTrust"
+      effect  = "Allow"
+      actions = ["sts:AssumeRole"]
+      principals {
+        type        = "AWS"
+        identifiers = var.trusted_role_arns
+      }
+    }
+  }
 }
 
 resource "aws_iam_role" "service_account_role" {

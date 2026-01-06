@@ -37,3 +37,9 @@ variable "policies" {
     allow_resources = list(string)
   }))
 }
+
+variable "trusted_role_arns" {
+  description = "IAM role ARNs allowed to assume this IRSA role"
+  type        = list(string)
+  default     = []
+}
