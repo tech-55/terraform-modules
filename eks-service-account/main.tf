@@ -59,7 +59,7 @@ module "create_aws_role_eks" {
 }
 
 
-resource "kubectl_manifest" "tls_secret" {
+resource "kubectl_manifest" "service_account" {
 yaml_body = <<YAML
 apiVersion: v1
 kind: ServiceAccount
