@@ -49,15 +49,15 @@ data "aws_iam_policy_document" "trust" {
     }
   }
 
-  dynamic "statement" {
+  dynamic "trusted_roles" {
     for_each = length(var.trusted_role_arns) > 0 ? [1] : []
     content {
       sid     = "RoleTrust"
       effect  = "Allow"
       actions = ["sts:AssumeRole"]
       principals {
-        type        = each.value.type
-        identifiers = each.value.identifiers
+        type        = trusted_roles.value.type
+        identifiers = trusted_roles.value.identifiers
       }
     }
   }
