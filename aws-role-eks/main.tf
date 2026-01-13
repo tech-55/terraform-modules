@@ -56,8 +56,8 @@ data "aws_iam_policy_document" "trust" {
       effect  = "Allow"
       actions = ["sts:AssumeRole"]
       principals {
-        type        = "AWS"
-        identifiers = var.trusted_role_arns
+        type        = statement.value.type
+        identifiers = statement.value.identifiers
       }
     }
   }
