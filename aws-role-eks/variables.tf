@@ -41,8 +41,8 @@ variable "policies" {
 variable "trusted_role_arns" {
   description = "IAM role ARNs allowed to assume this IRSA role"
   type        = list(object({
-    type         = string
-    identifiers = list(string)
+    aws_type         = string
+    aws_identifiers = list(string)
   }))
   default     = []
 }
