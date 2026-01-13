@@ -53,7 +53,7 @@ data "aws_iam_policy_document" "trust" {
     for_each = var.trusted_role_arns
     iterator = trust
     content {
-      sid     = "RoleTrust"
+      sid     = "RoleTrust-${trust.key}"
       effect  = "Allow"
       actions = ["sts:AssumeRole"]
       principals {
