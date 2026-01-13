@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "trust" {
   }
 
   dynamic "statement" {
-    for_each = length(var.trusted_role_arns) > 0 ? [1] : []
+    for_each = var.trusted_role_arns
     iterator = trust
     content {
       sid     = "RoleTrust"
