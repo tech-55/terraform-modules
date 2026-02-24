@@ -12,7 +12,7 @@ locals {
   aws_pci_account_id = "535424203419"  //pci account id
   aws_production_account_id = "025066240173"  //production account id
 
-  suffix_app_name = var.aws_account == local.aws_sandbox_account_id ? "-snb" : var.aws_account == local.aws_pci_account_id ? "-pci-prd" : var.aws_account == local.aws_production_account_id ? "-prd"  : "unknown"
+  suffix_app_name = var.aws_account == local.aws_sandbox_account_id ? "-snb" : var.aws_account == local.aws_pci_account_id ? "-pci-prd" : var.aws_account == local.aws_production_account_id ? "-prd" : "unknown"
   app_name = "${var.app_name}${local.suffix_app_name}"
 
   automate_sync = var.aws_account == local.aws_sandbox_account_id ? true : false
