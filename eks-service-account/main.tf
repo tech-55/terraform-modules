@@ -64,7 +64,7 @@ yaml_body = <<YAML
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: "${var.namespace}-${var.app_name}-sa"
+  name: "${module.create_aws_role_eks.service_account_name}"
   namespace: ${var.namespace}
   annotations:
     eks.amazonaws.com/role-arn: ${module.create_aws_role_eks.role_arn}

@@ -9,3 +9,7 @@ output "role_name" {
 output "policy_arn" {
     value = aws_iam_policy.service_account_policy.arn
 }
+
+output "service_account_name" {
+    value = local.app_name
+}
