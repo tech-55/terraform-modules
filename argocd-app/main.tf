@@ -33,10 +33,10 @@ locals {
     syncOptions = null
   } : {
     automated = {
-      prune = false
-      selfHeal = false
+      prune = true
+      selfHeal = true
     },
-    syncOptions = []
+    syncOptions = null
   }
 }
 
