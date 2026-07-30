@@ -25,19 +25,27 @@ locals {
   environment_name =  var.aws_account == local.aws_sandbox_account_id ? "Sandbox" : "Production"
   prefix_env = var.aws_account == local.aws_pci_account_id ? "Pci" : ""
 
-  sync_policy = var.aws_account == local.aws_sandbox_account_id ? {
+  # sync_policy = var.aws_account == local.aws_sandbox_account_id ? {
+  #   automated = {
+  #     prune = true
+  #     selfHeal = true
+  #   },
+  #   syncOptions = null
+  # } : {
+  #   automated = {
+  #     prune = true
+  #     selfHeal = true
+  #   },
+  #   syncOptions = null
+  # }
+  sync_policy =  {
     automated = {
-      prune = true
-      selfHeal = true
+      prune = false
+      selfHeal = false
     },
-    syncOptions = null
-  } : {
-    automated = {
-      prune = true
-      selfHeal = true
-    },
-    syncOptions = null
+    syncOptions = []
   }
+
 }
 
 provider "aws" {
