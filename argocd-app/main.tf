@@ -164,7 +164,7 @@ resource "kubernetes_manifest" "argocd_app" {
         namespace = var.namespace
       }
 
-      syncPolicy = local.sync_policy
+      # syncPolicy = local.sync_policy
     }
   }
 }
