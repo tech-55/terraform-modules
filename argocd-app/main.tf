@@ -43,7 +43,7 @@ locals {
       prune = true
       selfHeal = true
     },
-    syncOptions = []
+    syncOptions = null
   }
 
 }
