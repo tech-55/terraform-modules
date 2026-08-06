@@ -40,8 +40,8 @@ locals {
   # }
   sync_policy =  {
     automated = {
-      prune = false
-      selfHeal = false
+      prune = true
+      selfHeal = true
     },
     syncOptions = []
   }
